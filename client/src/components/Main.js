@@ -1,17 +1,27 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { AgGridColumn, AgGridReact } from "ag-grid-react";
 import "ag-grid-community/dist/styles/ag-grid.css";
 import "ag-grid-community/dist/styles/ag-theme-alpine.css";
+
+import Submited from "./Submited";
+import { GridApi } from "ag-grid-community";
 
 const Main = () => {
   const [gridApi, setGridApi] = useState(null);
   const [gridColumnApi, setGridColumnApi] = useState(null);
 
+  const [submitData, setSubmitData] = useState([]);
+  const [submitClicked, setSubmitClicked] = useState(false);
+  const [deleteSelectedRowClicked, setDeleteSelectedRowClicked] = useState(
+    false
+  );
+  const [addRowClicked, setAddRowClicked] = useState(false);
+  const [newRow, setNewRow] = useState([]);
   const [rowData, setRowData] = useState([
     {
       id: "Toyota",
       name: "Celica",
-      email: 35000,
+      email: "abc@gmail.com",
       gender: "Male",
       dob: "12",
       country: "India",
@@ -20,7 +30,7 @@ const Main = () => {
     {
       id: "Ford",
       name: "Mondeo",
-      email: 32000,
+      email: "abc@gmail.com",
       gender: "Male",
       dob: "12",
       country: "India",
@@ -29,7 +39,7 @@ const Main = () => {
     {
       id: "Porsche",
       name: "Boxter",
-      email: 72000,
+      email: "abc@gmail.com",
       gender: "Male",
       dob: "12",
       country: "India",
@@ -50,27 +60,61 @@ const Main = () => {
       field: "name",
       editable: true,
       singleClickEdit: true,
+      cellStyle: function (params) {
+        if (params.value === "") {
+          return { backgroundColor: "white" };
+        } else if (params.value.length <= 2) {
+          return { backgroundColor: "yellow" };
+        } else {
+          return { backgroundColor: "white" };
+        }
+      },
     },
     {
       headerName: "Email",
       field: "email",
       editable: true,
       singleClickEdit: true,
+      cellStyle: function (params) {
+        if (params.value == "") {
+          return { backgroundColor: "white" };
+        }
+        if (
+          /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(
+            params.value
+          )
+        ) {
+          return { backgroundColor: "white" };
+        }
+        // checkMailRegex(params);
+
+        return { backgroundColor: "red" };
+      },
     },
     {
       headerName: "Gender",
       field: "gender",
       singleClickEdit: true,
-      cellRenderer: "genderRenderer",
+      editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: ["Male", "Female"],
+      },
     },
     {
       headerName: "DOB",
       field: "dob",
       editable: true,
+      browserDatePicker: true,
     },
     {
       headerName: "Country",
       field: "country",
+      editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: ["India"],
+      },
     },
     {
       headerName: "City",
@@ -78,44 +122,181 @@ const Main = () => {
     },
   ];
 
-  const onButtonClick = () => {
-    const selectedNodes = gridApi.getSelectedNodes();
-    console.log(selectedNodes);
-    const selectedData = selectedNodes.map((node) => node.data);
-    console.log(selectedData);
-    const selectedDataStringPresentation = selectedData
-      .map((node) => node.id + " " + node.name + " " + node.gender)
-      .join(", ");
-    alert(`Selected node ${selectedDataStringPresentation}`);
+  // function checkMailRegex(params) {
+  //   const regEx = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+  //   if (params.value != "") {
+  //     if (!params.value.match(regEx)) {
+  //       return { backgroundColor: "yellow" };
+  //     }
+  //   }
+  // }
+
+  const defaultColDef = {
+    editable: true,
+    singleClickEdit: true,
   };
 
-  const GenderRenderer = (prpps) => {
-    const [gender, setGender] = useState("Female");
+  useEffect(() => {
+    if (sessionStorage.getItem("refreshRowData") != null) {
+      let data = JSON.parse(sessionStorage.getItem("refreshRowData"));
+      setRowData(data);
+    }
+    return () => {
+      localStorage.getItem("submitedData");
+    };
+  });
 
-    const onGenderChange = (event) => {
-      setGender(event.target.value);
+  useEffect(() => {
+    if (submitClicked == true) {
+      setSubmitData(rowData);
+      console.log(submitData);
+      var res = gridApi.applyTransaction({ update: submitData });
+      console.log(res);
+
+      console.log(rowData);
+    }
+    return () => {
+      setSubmitClicked(false);
+    };
+  }, [submitClicked]);
+
+  useEffect(() => {
+    if (addRowClicked == true) {
+      let newItems = [
+        {
+          id: "Porsche",
+          name: "Boxter",
+          email: "abc@gmail.com",
+          gender: "Male",
+          dob: "12",
+          country: "India",
+          city: "Nagpur",
+        },
+      ];
+
+      setRowData(...rowData, newItems);
+
+      console.log(rowData);
+    }
+    return () => {
+      setAddRowClicked(false);
+    };
+  }, [addRowClicked]);
+
+  const onAddRowClick = () => {
+    let newItems = [
+      {
+        id: "Porsche",
+        name: "Boxter",
+        email: "",
+        gender: "Male",
+        dob: "12",
+        country: "India",
+        city: "Nagpur",
+      },
+    ];
+    // setAddRowClicked(true);
+
+    let res = gridApi.applyTransaction({
+      add: newItems,
+      addIndex: -1,
+    });
+    sessionStorage.setItem(
+      "refreshRowData",
+      JSON.stringify([...rowData, ...newItems])
+    );
+  };
+
+  const onDeleteNonSelectedRowsClick = () => {
+    let selectedData = gridApi.getSelectedRows();
+    gridApi.selectAll();
+    let allData = gridApi.getSelectedRows();
+    gridApi.deselectAll();
+    let deleteData = [];
+    allData.forEach((data) => {
+      selectedData.forEach((selectData) => {
+        if (data.id !== selectData.id) {
+          deleteData.push(data);
+        }
+      });
+    });
+
+    console.log(deleteData);
+    let res = gridApi.applyTransaction({ remove: deleteData });
+  };
+
+  const onDeleteSelectedRowsClick = () => {
+    var selectedData = gridApi.getSelectedRows();
+
+    console.log(selectedData);
+    let res = gridApi.applyTransaction({ remove: selectedData });
+
+    // setRowData(tempData);
+    console.log(rowData);
+  };
+
+  const onSubmitClick = () => {
+    // setSubmitClicked(true);
+    gridApi.selectAll();
+    let data = gridApi.getSelectedRows();
+    gridApi.deselectAll();
+    localStorage.setItem("submitedData", JSON.stringify(data));
+    sessionStorage.setItem("refreshRowData", JSON.stringify(data));
+    sessionStorage.setItem("refreshSubmitData", JSON.stringify(data));
+  };
+
+  const NameRenderer = (props) => {
+    const [name, setName] = useState();
+    const [warning, setWarning] = useState(false);
+
+    const onNameChange = (e) => {
+      if (e.target.value.length < 3) {
+        setWarning(true);
+      } else {
+        setWarning(false);
+        setName(name);
+      }
     };
 
     return (
-      <div>
-        <select value={gender} onChange={onGenderChange}>
-          <option value="Male"> Male </option>
-          <option value="Female"> Female </option>
-        </select>
+      <div className={warning ? "warning-style" : ""}>
+        <input type="text" onChange={(e) => onNameChange(e)} placeholder="Name">
+          {name}
+        </input>
       </div>
     );
   };
 
+  useEffect(() => {}, [submitData, rowData]);
+
   return (
     <div>
       <div className="ag-theme-alpine main-table-size">
-        <button onClick={() => onButtonClick()}>BUTTON_SELECTED</button>
+        <div className="button-box">
+          <div className="button">
+            <button onClick={() => onAddRowClick()}>Add Row</button>
+          </div>
+          <div className="button">
+            <button onClick={() => onDeleteSelectedRowsClick()}>
+              Delete Selected Rows
+            </button>
+          </div>
+          <div className="button">
+            <button onClick={() => onDeleteNonSelectedRowsClick()}>
+              Delete Non Selected Rows
+            </button>
+          </div>
+          <div className="button">
+            <button onClick={() => onSubmitClick()}>Submit</button>
+          </div>
+        </div>
         <AgGridReact
           rowData={rowData}
+          defaultColDef={defaultColDef}
           columnDefs={columnDefs}
           rowSelection="multiple"
           frameworkComponents={{
-            genderRenderer: GenderRenderer,
+            nameRenderer: NameRenderer,
           }}
           onGridReady={(params) => {
             setGridApi(params.api);
@@ -123,6 +304,13 @@ const Main = () => {
           }}
         ></AgGridReact>
       </div>
+      {true ? (
+        <div>
+          <Submited />
+        </div>
+      ) : (
+        <div></div>
+      )}
     </div>
   );
 };

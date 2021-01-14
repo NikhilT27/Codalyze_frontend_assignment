@@ -44,3 +44,18 @@
   width: 100vw;
   height: 50vh;
 }
+
+.button-box {
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  padding: 20px;
+}
+
+.button {
+  padding-right: 20px;
+}
+
+.warning-style {
+  background-color: yellow;
+}
