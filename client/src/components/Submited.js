@@ -4,32 +4,24 @@ import "ag-grid-community/dist/styles/ag-grid.css";
 import "ag-grid-community/dist/styles/ag-theme-alpine.css";
 
 function Submited() {
-  const [gridApi, setGridApi] = useState(null);
-  const [gridColumnApi, setGridColumnApi] = useState(null);
-
-  const [rowData, setRowData] = useState([]);
-
+  const [submitData, setSubmitData] = useState([]);
   useEffect(() => {
     if (sessionStorage.getItem("refreshSubmitData") != null) {
       let data = JSON.parse(sessionStorage.getItem("refreshSubmitData"));
-      setRowData(data);
-    }
-    return () => {};
-  });
-
-  useEffect(() => {
-    if (localStorage.getItem("submitedData") != null) {
-      let data = localStorage.getItem("submitedData");
-      setRowData(JSON.parse(data));
+      let str1 = JSON.stringify(data);
+      let str2 = JSON.stringify(submitData);
+      if (str1.localeCompare(str2) != 0) {
+        // dispatch(addBySubmitData(data));
+        setSubmitData(data);
+      }
+    } else {
+      sessionStorage.setItem("refreshSubmitData", JSON.stringify(submitData));
     }
     return () => {
       // localStorage.removeItem("submitedData");
     };
-  }, [rowData]);
+  });
 
-  function updateRows() {
-    console.log(rowData);
-  }
   const columnDefs = [
     {
       headerName: "Id",
@@ -61,16 +53,31 @@ function Submited() {
     },
   ];
 
+  const defaultColDef = {
+    width: 180,
+    minWidth: 50,
+    maxWidth: 300,
+    resizable: true,
+    autoHeight: true,
+    flex: true,
+    cellStyle: { textAlign: "left" },
+  };
+
   return (
-    <div className="ag-theme-alpine main-table-size">
-      <AgGridReact
-        rowData={rowData}
-        columnDefs={columnDefs}
-        onGridReady={(params) => {
-          setGridApi(params.api);
-          setGridColumnApi(params.columnApi);
-        }}
-      ></AgGridReact>
+    <div>
+      <div>
+        {submitData != [] ? (
+          <div className="ag-theme-alpine main-table-size">
+            <AgGridReact
+              rowData={submitData}
+              defaultColDef={defaultColDef}
+              columnDefs={columnDefs}
+            ></AgGridReact>
+          </div>
+        ) : (
+          <div></div>
+        )}
+      </div>
     </div>
   );
 }

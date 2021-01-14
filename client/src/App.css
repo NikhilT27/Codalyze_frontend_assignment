@@ -59,3 +59,18 @@
 .warning-style {
   background-color: yellow;
 }
+
+.delete-button {
+  width: 20px;
+  height: 20px;
+  padding-top: 10px;
+  background-color: transparent;
+  border: none;
+  outline: none;
+}
+
+.delete-button-box {
+  display: flex;
+  align-items: center;
+  justify-content: left;
+}
