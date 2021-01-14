@@ -22,7 +22,9 @@ function Submited() {
       let data = localStorage.getItem("submitedData");
       setRowData(JSON.parse(data));
     }
-    return () => {};
+    return () => {
+      // localStorage.removeItem("submitedData");
+    };
   }, [rowData]);
 
   function updateRows() {

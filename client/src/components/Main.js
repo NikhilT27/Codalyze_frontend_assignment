@@ -17,6 +17,7 @@ const Main = () => {
   );
   const [addRowClicked, setAddRowClicked] = useState(false);
   const [newRow, setNewRow] = useState([]);
+  const [isError, setIsError] = useState(false);
   const [rowData, setRowData] = useState([
     {
       id: "Toyota",
@@ -54,6 +55,7 @@ const Main = () => {
       editable: true,
       singleClickEdit: true,
       checkboxSelection: true,
+      cellStyle: checkEmpty,
     },
     {
       headerName: "Name",
@@ -88,7 +90,7 @@ const Main = () => {
         }
         // checkMailRegex(params);
 
-        return { backgroundColor: "red" };
+        return { backgroundColor: "yellow" };
       },
     },
     {
@@ -122,41 +124,42 @@ const Main = () => {
     },
   ];
 
-  // function checkMailRegex(params) {
-  //   const regEx = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
-  //   if (params.value != "") {
-  //     if (!params.value.match(regEx)) {
-  //       return { backgroundColor: "yellow" };
-  //     }
-  //   }
-  // }
-
   const defaultColDef = {
     editable: true,
     singleClickEdit: true,
+    resizable: true,
+    autoHeight: true,
+    flex: true,
+    cellStyle: { textAlign: "left" },
   };
 
+  function checkEmpty(params) {
+    if (params.value !== "") {
+      return { backgroundColor: "white" };
+    } else {
+      return { backgroundColor: "red" };
+    }
+  }
   useEffect(() => {
     if (sessionStorage.getItem("refreshRowData") != null) {
       let data = JSON.parse(sessionStorage.getItem("refreshRowData"));
       setRowData(data);
     }
     return () => {
-      localStorage.getItem("submitedData");
+      localStorage.removeItem("submitedData");
     };
   });
 
   useEffect(() => {
     if (submitClicked == true) {
-      setSubmitData(rowData);
-      console.log(submitData);
-      var res = gridApi.applyTransaction({ update: submitData });
-      console.log(res);
-
-      console.log(rowData);
+      // setSubmitData(rowData);
+      // console.log(submitData);
+      // var res = gridApi.applyTransaction({ update: submitData });
+      // console.log(res);
+      // console.log(rowData);
     }
     return () => {
-      setSubmitClicked(false);
+      // setSubmitClicked(false);
     };
   }, [submitClicked]);
 
@@ -236,7 +239,7 @@ const Main = () => {
   };
 
   const onSubmitClick = () => {
-    // setSubmitClicked(true);
+    setSubmitClicked(true);
     gridApi.selectAll();
     let data = gridApi.getSelectedRows();
     gridApi.deselectAll();
