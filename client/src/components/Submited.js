@@ -5,21 +5,19 @@ import "ag-grid-community/dist/styles/ag-theme-alpine.css";
 
 function Submited() {
   const [submitData, setSubmitData] = useState([]);
+
   useEffect(() => {
     if (sessionStorage.getItem("refreshSubmitData") != null) {
       let data = JSON.parse(sessionStorage.getItem("refreshSubmitData"));
       let str1 = JSON.stringify(data);
       let str2 = JSON.stringify(submitData);
       if (str1.localeCompare(str2) != 0) {
-        // dispatch(addBySubmitData(data));
         setSubmitData(data);
       }
     } else {
       sessionStorage.setItem("refreshSubmitData", JSON.stringify(submitData));
     }
-    return () => {
-      // localStorage.removeItem("submitedData");
-    };
+    return () => {};
   });
 
   const columnDefs = [
@@ -39,6 +37,7 @@ function Submited() {
     {
       headerName: "Gender",
       field: "gender",
+      width: 100,
     },
     {
       headerName: "DOB",

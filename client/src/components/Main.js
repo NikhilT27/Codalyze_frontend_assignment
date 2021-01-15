@@ -6,20 +6,12 @@ import "ag-grid-community/dist/styles/ag-theme-alpine.css";
 import { city } from "../util/cities";
 import deleteIconPng from "../image/trash.png";
 import Submited from "./Submited";
-import { GridApi } from "ag-grid-community";
 
 const Main = () => {
   const [gridApi, setGridApi] = useState(null);
   const [gridColumnApi, setGridColumnApi] = useState(null);
 
-  const [submitData, setSubmitData] = useState([]);
   const [submitClicked, setSubmitClicked] = useState(false);
-  const [deleteSelectedRowClicked, setDeleteSelectedRowClicked] = useState(
-    false
-  );
-  const [addRowClicked, setAddRowClicked] = useState(false);
-  const [newRow, setNewRow] = useState([]);
-  const [isError, setIsError] = useState(false);
   const [rowData, setRowData] = useState([
     {
       id: "1",
@@ -59,6 +51,11 @@ const Main = () => {
       checkboxSelection: true,
       width: 100,
       cellRenderer: "idRenderer",
+      cellStyle: function (params) {
+        if (params.node.data.id === "") {
+          return { backgroundColor: "red" };
+        }
+      },
     },
     {
       headerName: "Name",
@@ -68,7 +65,7 @@ const Main = () => {
       cellRenderer: "nameRenderer",
       cellStyle: function (params) {
         if (params.node.data.name.length == 0) {
-          return { backgroundColor: "white" };
+          return { backgroundColor: "red" };
         } else if (params.node.data.name.length <= 2) {
           return { backgroundColor: "yellow" };
         } else {
@@ -84,7 +81,7 @@ const Main = () => {
       cellRenderer: "emailRenderer",
       cellStyle: function (params) {
         if (params.node.data.email == "") {
-          return { backgroundColor: "white" };
+          return { backgroundColor: "red" };
         }
         if (
           /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(
@@ -164,15 +161,12 @@ const Main = () => {
       let str1 = JSON.stringify(data);
       let str2 = JSON.stringify(rowData);
       if (str1.localeCompare(str2) != 0) {
-        // dispatch(addByRowData(data));
         setRowData(data);
       }
     } else {
       sessionStorage.setItem("refreshRowData", JSON.stringify(rowData));
     }
-    return () => {
-      // localStorage.removeItem("submitedData");
-    };
+    return () => {};
   });
 
   const onAddRowClick = () => {
@@ -209,25 +203,70 @@ const Main = () => {
         }
       });
     });
+
     let res = gridApi.applyTransaction({ remove: deleteData });
   };
 
   const onDeleteSelectedRowsClick = () => {
     var selectedData = gridApi.getSelectedRows();
-
-    console.log(selectedData);
     let res = gridApi.applyTransaction({ remove: selectedData });
   };
 
   const onSubmitClick = () => {
-    setSubmitClicked(!submitClicked);
+    setSubmitClicked(true);
     gridApi.selectAll();
     let data = gridApi.getSelectedRows();
     gridApi.deselectAll();
     sessionStorage.setItem("refreshRowData", JSON.stringify(data));
-    sessionStorage.setItem("refreshSubmitData", JSON.stringify(data));
-    alert("Submit");
-    // window.location.reload();
+    if (checkError()) {
+      sessionStorage.setItem("refreshRowData", JSON.stringify(data));
+      sessionStorage.setItem("refreshSubmitData", JSON.stringify(data));
+      alert("Submit");
+      window.location.reload();
+    } else {
+      alert("Please Verify Error");
+    }
+  };
+
+  const checkError = () => {
+    let errorList = [];
+    gridApi.forEachNode((node) => {
+      let errorEach = {};
+      if (node.data.id == "") {
+        errorEach.id = node.__objectId;
+      }
+
+      if (node.data.name == "") {
+        errorEach.name = node.__objectId;
+      }
+
+      if (node.data.name.length != 0 && node.data.name.length <= 2) {
+        errorEach.name = node.__objectId;
+      }
+
+      if (node.data.email == "") {
+        errorEach.email = node.__objectId;
+      }
+
+      if (
+        !/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(
+          node.data.email
+        )
+      ) {
+        errorEach.email = node.__objectId;
+      }
+
+      console.log(errorEach);
+      if (Object.keys(errorEach).length !== 0) {
+        errorList.push(errorEach);
+      }
+    });
+
+    if (errorList.length != 0) {
+      return false;
+    } else {
+      return true;
+    }
   };
 
   const NameRenderer = (params) => {
