@@ -57,17 +57,18 @@ const Main = () => {
       editable: true,
       singleClickEdit: true,
       checkboxSelection: true,
-      cellStyle: checkEmpty,
+      cellRenderer: "idRenderer",
     },
     {
       headerName: "Name",
       field: "name",
       editable: true,
       singleClickEdit: true,
+      cellRenderer: "nameRenderer",
       cellStyle: function (params) {
-        if (params.value === "") {
+        if (params.node.data.name.length == 0) {
           return { backgroundColor: "white" };
-        } else if (params.value.length <= 2) {
+        } else if (params.node.data.name.length <= 2) {
           return { backgroundColor: "yellow" };
         } else {
           return { backgroundColor: "white" };
@@ -79,16 +80,19 @@ const Main = () => {
       field: "email",
       editable: true,
       singleClickEdit: true,
+      cellRenderer: "emailRenderer",
       cellStyle: function (params) {
-        if (params.value == "") {
-          return { backgroundColor: "yellow" };
+        if (params.node.data.email == "") {
+          return { backgroundColor: "white" };
         }
         if (
           /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(
-            params.value
+            params.node.data.email
           )
         ) {
           return { backgroundColor: "white" };
+        } else {
+          return { backgroundColor: "yellow" };
         }
         // checkMailRegex(params);
 
@@ -148,16 +152,9 @@ const Main = () => {
     resizable: true,
     autoHeight: true,
     flex: true,
+    singleClickEdit: true,
     cellStyle: { textAlign: "left" },
   };
-
-  function checkEmpty(params) {
-    if (params.value !== "") {
-      return { backgroundColor: "white" };
-    } else {
-      return { backgroundColor: "red" };
-    }
-  }
 
   useEffect(() => {
     if (sessionStorage.getItem("refreshRowData") != null) {
@@ -231,25 +228,33 @@ const Main = () => {
     // window.location.reload();
   };
 
-  const NameRenderer = (props) => {
-    const [name, setName] = useState();
-    const [warning, setWarning] = useState(false);
-
-    const onNameChange = (e) => {
-      if (e.target.value.length < 3) {
-        setWarning(true);
-      } else {
-        setWarning(false);
-        setName(name);
-      }
-    };
-
+  const NameRenderer = (params) => {
     return (
-      <div className={warning ? "warning-style" : ""}>
-        <input type="text" onChange={(e) => onNameChange(e)} placeholder="Name">
-          {name}
-        </input>
-      </div>
+      <input
+        className="input-style"
+        placeholder="Name"
+        value={params.node.data.name}
+      ></input>
+    );
+  };
+
+  const EmailRenderer = (params) => {
+    return (
+      <input
+        className="input-style"
+        placeholder="Email"
+        value={params.node.data.email}
+      ></input>
+    );
+  };
+
+  const IdRenderer = (params) => {
+    return (
+      <input
+        className="input-style"
+        placeholder="Id"
+        value={params.node.data.id}
+      ></input>
     );
   };
 
@@ -306,6 +311,8 @@ const Main = () => {
           rowSelection="multiple"
           frameworkComponents={{
             nameRenderer: NameRenderer,
+            emailRenderer: EmailRenderer,
+            idRenderer: IdRenderer,
             deleteIcon: deleteIcon,
           }}
           onGridReady={(params) => {

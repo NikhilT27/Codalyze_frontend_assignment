@@ -82,3 +82,10 @@
   align-items: center;
   justify-content: left;
 }
+
+.input-style {
+  border: none;
+  border-width: 0;
+  box-shadow: none;
+  background-color: transparent;
+}
