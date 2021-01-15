@@ -57,6 +57,7 @@ const Main = () => {
       editable: true,
       singleClickEdit: true,
       checkboxSelection: true,
+      width: 100,
       cellRenderer: "idRenderer",
     },
     {
@@ -95,8 +96,6 @@ const Main = () => {
           return { backgroundColor: "yellow" };
         }
         // checkMailRegex(params);
-
-        return { backgroundColor: "yellow" };
       },
     },
     {
@@ -104,6 +103,7 @@ const Main = () => {
       field: "gender",
       singleClickEdit: true,
       editable: true,
+      width: 100,
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
         values: ["Male", "Female"],
@@ -139,6 +139,7 @@ const Main = () => {
       headerName: "",
       field: "delete",
       editable: false,
+      width: 50,
       cellRenderer: "deleteIcon",
     },
   ];
@@ -146,10 +147,11 @@ const Main = () => {
   const defaultColDef = {
     editable: true,
     singleClickEdit: true,
-    width: 180,
+
     minWidth: 50,
     maxWidth: 300,
     resizable: true,
+    autoWidth: true,
     autoHeight: true,
     flex: true,
     singleClickEdit: true,
@@ -175,9 +177,9 @@ const Main = () => {
 
   const onAddRowClick = () => {
     let newItem = {
-      id: "Porsche",
-      name: "Boxter",
-      email: "aa@mail.com",
+      id: "",
+      name: "",
+      email: "",
       gender: "Male",
       dob: "12-01-2020",
       country: "India",
@@ -321,7 +323,10 @@ const Main = () => {
           }}
         ></AgGridReact>
       </div>
-      {rowData != [] ? <Submited props={rowData} /> : <div>None</div>}
+
+      <div className="main-table-size">
+        {rowData != [] ? <Submited props={rowData} /> : <div>None</div>}
+      </div>
     </div>
   );
 };

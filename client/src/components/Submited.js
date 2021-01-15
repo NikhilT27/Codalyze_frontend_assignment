@@ -26,6 +26,7 @@ function Submited() {
     {
       headerName: "Id",
       field: "id",
+      width: 100,
     },
     {
       headerName: "Name",
@@ -68,6 +69,9 @@ function Submited() {
       <div>
         {submitData != [] ? (
           <div className="ag-theme-alpine main-table-size">
+            <div className="title">
+              <h2>Submitted Data</h2>
+            </div>
             <AgGridReact
               rowData={submitData}
               defaultColDef={defaultColDef}

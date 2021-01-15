@@ -41,8 +41,10 @@
 }
 
 .main-table-size {
-  width: 100vw;
-  height: 50vh;
+  position: relative;
+  width: 95vw;
+  height: 250px;
+  margin-bottom: 100px;
 }
 
 .button-box {
@@ -69,8 +71,6 @@
 }
 
 .delete-button {
-  width: 20px;
-  height: 20px;
   padding-top: 10px;
   background-color: transparent;
   border: none;
@@ -80,7 +80,7 @@
 .delete-button-box {
   display: flex;
   align-items: center;
-  justify-content: left;
+  justify-content: center;
 }
 
 .input-style {
@@ -88,4 +88,9 @@
   border-width: 0;
   box-shadow: none;
   background-color: transparent;
+}
+
+.title {
+  display: flex;
+  align-self: start;
 }
