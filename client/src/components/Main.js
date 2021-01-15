@@ -22,7 +22,7 @@ const Main = () => {
   const [isError, setIsError] = useState(false);
   const [rowData, setRowData] = useState([
     {
-      id: "Toyota",
+      id: "1",
       name: "Celica",
       email: "abc@gmail.com",
       gender: "Male",
@@ -31,7 +31,7 @@ const Main = () => {
       city: "Nagpur",
     },
     {
-      id: "Ford",
+      id: "2",
       name: "Mondeo",
       email: "abc@gmail.com",
       gender: "Male",
@@ -40,7 +40,7 @@ const Main = () => {
       city: "Nagpur",
     },
     {
-      id: "Porsche",
+      id: "3",
       name: "Boxter",
       email: "abc@gmail.com",
       gender: "Male",
@@ -272,21 +272,31 @@ const Main = () => {
     <div>
       <div className="ag-theme-alpine main-table-size">
         <div className="button-box">
-          <div className="button">
-            <button onClick={() => onAddRowClick()}>Add Row</button>
+          <div>
+            <button className="button" onClick={() => onAddRowClick()}>
+              Add Row
+            </button>
           </div>
-          <div className="button">
-            <button onClick={() => onDeleteSelectedRowsClick()}>
+          <div>
+            <button
+              className="button"
+              onClick={() => onDeleteSelectedRowsClick()}
+            >
               Delete Selected Rows
             </button>
           </div>
-          <div className="button">
-            <button onClick={() => onDeleteNonSelectedRowsClick()}>
+          <div>
+            <button
+              className="button"
+              onClick={() => onDeleteNonSelectedRowsClick()}
+            >
               Delete Non Selected Rows
             </button>
           </div>
-          <div className="button">
-            <button onClick={() => onSubmitClick()}>Submit</button>
+          <div>
+            <button className="button" onClick={() => onSubmitClick()}>
+              Submit
+            </button>
           </div>
         </div>
         <AgGridReact
