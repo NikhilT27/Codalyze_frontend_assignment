@@ -54,6 +54,8 @@ const Main = () => {
       cellStyle: function (params) {
         if (params.node.data.id === "") {
           return { backgroundColor: "red" };
+        } else {
+          return { backgroundColor: "white" };
         }
       },
     },
@@ -64,7 +66,7 @@ const Main = () => {
       singleClickEdit: true,
       cellRenderer: "nameRenderer",
       cellStyle: function (params) {
-        if (params.node.data.name.length == 0) {
+        if (params.node.data.name == "") {
           return { backgroundColor: "red" };
         } else if (params.node.data.name.length <= 2) {
           return { backgroundColor: "yellow" };
@@ -274,7 +276,7 @@ const Main = () => {
       <input
         className="input-style"
         placeholder="Name"
-        value={params.node.data.name}
+        defaultValue={params.node.data.name}
       ></input>
     );
   };
@@ -284,7 +286,7 @@ const Main = () => {
       <input
         className="input-style"
         placeholder="Email"
-        value={params.node.data.email}
+        defaultValue={params.node.data.email}
       ></input>
     );
   };
@@ -294,7 +296,7 @@ const Main = () => {
       <input
         className="input-style"
         placeholder="Id"
-        value={params.node.data.id}
+        defaultValue={params.node.data.id}
       ></input>
     );
   };
@@ -363,9 +365,7 @@ const Main = () => {
         ></AgGridReact>
       </div>
 
-      <div className="main-table-size">
-        {rowData != [] ? <Submited props={rowData} /> : <div>None</div>}
-      </div>
+      <div className="main-table-size">{true ? <Submited /> : <div></div>}</div>
     </div>
   );
 };
